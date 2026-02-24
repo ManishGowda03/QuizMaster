@@ -5,12 +5,23 @@ import jwt from "jsonwebtoken";
 /* ---------------- REGISTER ---------------- */
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
 
     // check if user exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
+    }
+
+    // Strong password validation
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+    if (!passwordRegex.test(password)) {
+      return res.status(400).json({
+        message:
+          "Password must be at least 8 characters long and include uppercase, lowercase, and a number",
+      });
     }
 
     // hash password
