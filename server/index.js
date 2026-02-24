@@ -5,6 +5,7 @@ import authRoutes from "./routes/authRoutes.js";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import quizRoutes from "./routes/quizRoutes.js";
+import attemptRoutes from "./routes/attemptRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -15,6 +16,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/quizzes", quizRoutes);
+app.use("/api/attempts", attemptRoutes);
 
 app.get("/", (req, res) => {
   res.send("QuizMaster API is running");
