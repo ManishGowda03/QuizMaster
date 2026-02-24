@@ -1,12 +1,10 @@
 import express from "express";
-import { protect, adminOnly } from "../middleware/authMiddleware.js";
+import { protect } from "../middleware/authMiddleware.js";
+import { getUserProfile } from "../controllers/userController.js";
 
 const router = express.Router();
 
-// Logged-in user route
-router.get("/profile", protect, (req, res) => {
-  res.json(req.user);
-});
-
+// Logged-in user profile
+router.get("/profile", protect, getUserProfile);
 
 export default router;
