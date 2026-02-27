@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { registerUser } from "../utils/api";
+import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 
 function Register() {
@@ -13,24 +13,28 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Frontend validation (UX only)
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
     if (!passwordRegex.test(password)) {
       setError(
-        "Password must be at least 8 characters long and include uppercase, lowercase, and a number"
+        "Password must include uppercase, lowercase, number and be 8+ characters"
       );
       return;
     }
 
     try {
-      await registerUser({ name, email, password });
+      await api.post("/auth/register", {
+        name,
+        email,
+        password,
+      });
 
-      // After successful registration → redirect to login
       navigate("/login");
     } catch (err) {
-      setError(err.message);
+      setError(
+        err.response?.data?.message || "Registration failed"
+      );
     }
   };
 

@@ -1,39 +1,18 @@
-const BASE_URL = "http://localhost:5000/api";
+import axios from "axios";
 
-// 🔐 Login API
-export const loginUser = async (data) => {
-  const response = await fetch(`${BASE_URL}/auth/login`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
+const api = axios.create({
+  baseURL: "http://localhost:5000/api",
+});
 
-  const result = await response.json();
+// Attach token automatically
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
 
-  if (!response.ok) {
-    throw new Error(result.message || "Login failed");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
 
-  return result;
-};
+  return config;
+});
 
-// 📝 Register API
-export const registerUser = async (data) => {
-  const response = await fetch(`${BASE_URL}/auth/register`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data),
-  });
-
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(result.message || "Registration failed");
-  }
-
-  return result;
-};
+export default api;

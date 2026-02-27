@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { loginUser } from "../utils/api";
+import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 
 function Login() {
@@ -13,16 +13,21 @@ function Login() {
     e.preventDefault();
 
     try {
-      const data = await loginUser({ email, password });
+      const res = await api.post("/auth/login", {
+        email,
+        password,
+      });
 
-      // Store token in localStorage
+      const data = res.data;
+
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data));
 
-      // Redirect to home
       navigate("/");
     } catch (err) {
-      setError(err.message);
+      setError(
+        err.response?.data?.message || "Login failed"
+      );
     }
   };
 

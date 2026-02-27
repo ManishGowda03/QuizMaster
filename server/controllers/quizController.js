@@ -24,6 +24,18 @@ export const createQuiz = async (req, res) => {
   }
 };
 
+export const getAllQuizzes = async (req, res) => {
+  try {
+    const quizzes = await Quiz.find().select(
+      "title description duration topic"
+    );
+
+    res.json(quizzes);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 export const getQuizByTopic = async (req, res) => {
   try {
     const quiz = await Quiz.findOne({
