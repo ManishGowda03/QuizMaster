@@ -65,3 +65,44 @@ export const getQuizByTopic = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getQuizById = async (req, res) => {
+  try {
+    const quiz = await Quiz.findById(req.params.id);
+
+    if (!quiz) {
+      return res.status(404).json({ message: "Quiz not found" });
+    }
+
+    res.status(200).json(quiz);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const updateQuiz = async (req, res) => {
+  try {
+    const { title, description, topic, duration, questions } = req.body;
+
+    const quiz = await Quiz.findById(req.params.id);
+
+    if (!quiz) {
+      return res.status(404).json({ message: "Quiz not found" });
+    }
+
+    quiz.title = title;
+    quiz.description = description;
+    quiz.topic = topic;
+    quiz.duration = duration;
+    quiz.questions = questions;
+
+    const updatedQuiz = await quiz.save();
+
+    res.status(200).json({
+      message: "Quiz updated successfully",
+      quiz: updatedQuiz,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
