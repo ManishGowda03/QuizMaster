@@ -78,8 +78,9 @@ function UpdateQuiz() {
         duration,
         questions,
       });
-
+      alert("Quiz updated successfully");
       navigate("/");
+      window.location.reload();
     } catch (error) {
       console.error("Error updating quiz:", error);
     }
@@ -128,9 +129,9 @@ function UpdateQuiz() {
               Question {qIndex + 1}
             </h2>
 
-            <input
-              type="text"
-              className="w-full p-2 bg-gray-700 rounded"
+            <textarea
+              className="w-full p-3 bg-gray-700 rounded resize-y"
+              rows="3"
               value={q.question}
               onChange={(e) =>
                 handleQuestionChange(qIndex, e.target.value)

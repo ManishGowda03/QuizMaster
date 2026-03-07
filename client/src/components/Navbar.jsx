@@ -18,10 +18,17 @@ function Navbar() {
 
       <div className="flex items-center gap-4">
         {user && (
-          <span className="text-gray-300">
+          <span className="text-gray-300 flex items-center gap-2">
             Welcome, {user.user?.name}
+
+            {user.user?.role === "admin" && (
+              <span className="bg-yellow-500 text-black px-2 py-1 rounded text-xs font-semibold">
+                Admin
+              </span>
+            )}
           </span>
         )}
+
 
         <button
           onClick={handleLogout}

@@ -121,11 +121,10 @@ const QuizPage = () => {
             <div
               className="bg-blue-500 h-3 rounded-full transition-all duration-300"
               style={{
-                width: `${
-                  (Object.keys(answers).length /
+                width: `${(Object.keys(answers).length /
                     quiz.questions.length) *
                   100
-                }%`,
+                  }%`,
               }}
             />
           </div>
@@ -153,11 +152,10 @@ const QuizPage = () => {
             {result.attempts.map((attempt, index) => (
               <div
                 key={index}
-                className={`mb-1 p-2 rounded ${
-                  attempt.score === result.bestScore
+                className={`mb-1 p-2 rounded ${attempt.score === result.bestScore
                     ? "bg-yellow-600"
                     : "bg-slate-700"
-                }`}
+                  }`}
               >
                 Attempt {index + 1} → {attempt.score}/
                 {result.totalQuestions}
@@ -172,44 +170,39 @@ const QuizPage = () => {
       {quiz.questions.map((q, index) => (
         <div
           key={q._id}
-          className="mb-6 bg-slate-800 p-4 rounded-xl transition-all duration-300 hover:scale-[1.01]"
+          className="mb-6 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow hover:border-blue-500 transition"
         >
-          <h2 className="font-semibold mb-2">
+          <h2 className="font-semibold mb-4 text-lg whitespace-pre-line font-mono">
             {index + 1}. {q.question}
           </h2>
 
-          {q.options.map((option, i) => {
-            const correctAnswer = result?.correctAnswers.find(
-              (c) => c.questionId === q._id
-            )?.correctAnswer;
-
-            return (
-              <label
-                key={i}
-                className={`block mb-2 cursor-pointer p-2 rounded ${
-                  result
-                    ? i === correctAnswer
-                      ? "bg-green-600"
-                      : answers[q._id] === i
-                      ? "bg-red-600"
-                      : ""
-                    : ""
+          {q.options.map((option, i) => (
+            <label
+              key={i}
+              className={`block mb-2 cursor-pointer p-3 rounded-lg border transition ${result
+                  ? i === result.correctAnswers.find(
+                    (c) => c.questionId === q._id
+                  )?.correctAnswer
+                    ? "bg-green-600 border-green-400"
+                    : answers[q._id] === i
+                      ? "bg-red-600 border-red-400"
+                      : "border-slate-700"
+                  : answers[q._id] === i
+                    ? "bg-blue-600 border-blue-400"
+                    : "border-slate-700 hover:bg-slate-700"
                 }`}
-              >
-                <input
-                  type="radio"
-                  name={q._id}
-                  className="mr-2"
-                  disabled={!!result}
-                  checked={answers[q._id] === i}
-                  onChange={() =>
-                    handleOptionChange(q._id, i)
-                  }
-                />
-                {option}
-              </label>
-            );
-          })}
+            >
+              <input
+                type="radio"
+                name={q._id}
+                className="mr-2"
+                disabled={result !== null}
+                checked={answers[q._id] === i}
+                onChange={() => handleOptionChange(q._id, i)}
+              />
+              {option}
+            </label>
+          ))}
         </div>
       ))}
 

@@ -26,6 +26,16 @@ function Home() {
 
     fetchQuizzes();
   }, []);
+  
+  const handleStartQuiz = (quiz) => {
+  const confirmStart = window.confirm(
+    `Start "${quiz.title}" quiz?\n\nDuration: ${quiz.duration} minutes.\nThe timer will begin immediately.`
+  );
+
+  if (!confirmStart) return;
+
+  navigate(`/quiz/${quiz.topic}`);
+};
 
   // ---------------- DELETE QUIZ (ADMIN) ----------------
   const handleDelete = async (quizId, e) => {
@@ -50,7 +60,7 @@ function Home() {
     <div className="min-h-screen bg-gray-900 text-white">
       <Navbar />
 
-      <div className="p-8">
+      <div className="max-w-6xl mx-auto p-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-3xl font-bold">
             Available Topics 📚
@@ -75,40 +85,47 @@ function Home() {
           {quizzes.map((quiz) => (
             <div
               key={quiz._id}
-              onClick={() => navigate(`/quiz/${quiz.topic}`)}
-              className="cursor-pointer bg-gray-800 p-6 rounded-xl shadow hover:scale-105 transition"
+              onClick={() => handleStartQuiz(quiz)}
+              className="cursor-pointer bg-slate-800 p-6 rounded-2xl shadow-lg border border-slate-700 
+  hover:shadow-2xl hover:scale-[1.03] hover:border-blue-500 
+  transition-all duration-300 flex flex-col justify-between"
             >
-              <h3 className="text-xl font-semibold mb-2">
-                {quiz.title}
-              </h3>
+              <div>
+                <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
+                  📘 {quiz.title}
+                </h3>
 
-              <p className="text-gray-400 mb-4">
-                {quiz.description}
-              </p>
+                <p className="text-gray-400 mb-4">
+                  {quiz.description}
+                </p>
 
-              <p className="text-sm text-gray-500 mb-4">
-                Duration: {quiz.duration} mins
-              </p>
+                <p className="text-sm text-gray-500 flex items-center gap-2">
+                  ⏱ Duration: {quiz.duration} mins
+                </p>
+              </div>
+
+              {/* User Button */}
+              <button
+                className="mt-4 bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg transition"
+              >
+                Start Quiz
+              </button>
 
               {/* Admin Controls */}
               {isAdmin && (
                 <div
-                  className="flex gap-2 mt-2"
-                  onClick={(e) => e.stopPropagation()} // prevent card click
+                  className="mt-4 flex gap-2"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <button
-                    onClick={(e) =>
-                      handleDelete(quiz._id, e)
-                    }
+                    onClick={(e) => handleDelete(quiz._id, e)}
                     className="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-500"
                   >
                     Delete
                   </button>
 
                   <button
-                    onClick={() =>
-                      navigate(`/admin/update/${quiz._id}`)
-                    }
+                    onClick={() => navigate(`/admin/update/${quiz._id}`)}
                     className="bg-yellow-600 px-4 py-2 rounded-lg hover:bg-yellow-500"
                   >
                     Update

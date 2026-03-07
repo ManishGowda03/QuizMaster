@@ -116,16 +116,16 @@ function AddQuiz() {
           <div key={qIndex} className="bg-gray-800 p-6 rounded-xl space-y-4">
             <h2 className="font-semibold">Question {qIndex + 1}</h2>
 
-            <input
-              type="text"
-              placeholder="Question text"
-              className="w-full p-2 bg-gray-700 rounded"
-              value={q.question}
-              onChange={(e) =>
-                handleQuestionChange(qIndex, e.target.value)
-              }
-              required
-            />
+            <textarea
+  placeholder="Question text"
+  className="w-full p-3 bg-gray-700 rounded resize-y"
+  rows="3"
+  value={q.question}
+  onChange={(e) =>
+    handleQuestionChange(qIndex, e.target.value)
+  }
+  required
+/>
 
             {q.options.map((option, oIndex) => (
               <input
