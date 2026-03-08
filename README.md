@@ -38,3 +38,10 @@ The platform supports timed quizzes, attempt tracking, and a clean responsive UI
 - Node.js
 - Express.js
 - MongoDB
+
+---
+
+## Live Demo
+
+Frontend: https://quiz-master-af2grp443-manishgowda03s-projects.vercel.app  
+Backend API: https://quizmaster-s2c3.onrender.com
