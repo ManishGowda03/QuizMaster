@@ -28,17 +28,34 @@ function UpdateQuiz() {
     }
   };
 
-  if (!quiz) return <div className="text-white">Loading...</div>;
+  if (!quiz)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-8">
-      <h1 className="text-3xl font-bold mb-6">Update Quiz</h1>
+    <div className="min-h-screen bg-gradient-to-br from-green-100 via-slate-100 to-emerald-100 py-10">
 
-      <QuizForm
-        initialData={quiz}
-        onSubmit={handleUpdate}
-        buttonText="Update Quiz"
-      />
+      <div className="max-w-4xl mx-auto px-6">
+
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">
+          Update Quiz
+        </h1>
+
+        <div className="bg-white border border-gray-200 shadow rounded-xl p-6">
+
+          <QuizForm
+            initialData={quiz}
+            onSubmit={handleUpdate}
+            buttonText="Update Quiz"
+          />
+
+        </div>
+
+      </div>
+
     </div>
   );
 }

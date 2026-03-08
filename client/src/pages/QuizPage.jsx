@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../utils/api";
+import { FaCheckCircle, FaTimesCircle, FaClock } from "react-icons/fa";
+import QuizTimer from "../components/QuizTimer";
 
 const QuizPage = () => {
   const { topic } = useParams();
@@ -11,27 +13,23 @@ const QuizPage = () => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
-  // ---------------- FETCH QUIZ ----------------
+  // Fetch quiz
   useEffect(() => {
     const fetchQuiz = async () => {
-      try {
-        const res = await api.get(`/quizzes/${topic}`);
-        setQuiz(res.data);
-        setTimeLeft(res.data.duration * 60);
-      } catch (error) {
-        console.error("Error fetching quiz:", error);
-      }
+      const res = await api.get(`/quizzes/${topic}`);
+      setQuiz(res.data);
+      setTimeLeft(res.data.duration * 60);
     };
 
     fetchQuiz();
   }, [topic]);
 
-  // ---------------- TIMER ----------------
+  // Timer
   useEffect(() => {
     if (!quiz) return;
 
-    // Auto submit when timer ends
     if (timeLeft <= 0 && !result) {
       handleSubmit(true);
       return;
@@ -46,7 +44,6 @@ const QuizPage = () => {
     return () => clearInterval(timer);
   }, [timeLeft, result, quiz]);
 
-  // ---------------- OPTION SELECT ----------------
   const handleOptionChange = (questionId, optionIndex) => {
     setAnswers((prev) => ({
       ...prev,
@@ -54,11 +51,9 @@ const QuizPage = () => {
     }));
   };
 
-  // ---------------- SUBMIT ----------------
   const handleSubmit = async (auto = false) => {
     if (result || loading) return;
 
-    // Confirm only for manual submission
     if (!auto) {
       const confirmSubmit = window.confirm(
         "Are you sure you want to submit the quiz?"
@@ -66,28 +61,22 @@ const QuizPage = () => {
       if (!confirmSubmit) return;
     }
 
-    try {
-      setLoading(true);
+    setLoading(true);
 
-      const formattedAnswers = Object.keys(answers).map((id) => ({
-        questionId: id,
-        selectedOption: answers[id],
-      }));
+    const formattedAnswers = Object.keys(answers).map((id) => ({
+      questionId: id,
+      selectedOption: answers[id],
+    }));
 
-      const res = await api.post("/attempts", {
-        quizId: quiz._id,
-        answers: formattedAnswers,
-      });
+    const res = await api.post("/attempts", {
+      quizId: quiz._id,
+      answers: formattedAnswers,
+    });
 
-      setResult(res.data);
-    } catch (error) {
-      console.error("Error submitting quiz:", error);
-    } finally {
-      setLoading(false);
-    }
+    setResult(res.data);
+    setLoading(false);
   };
 
-  // ---------------- RETAKE ----------------
   const handleRetake = () => {
     setAnswers({});
     setResult(null);
@@ -95,146 +84,164 @@ const QuizPage = () => {
   };
 
   if (!quiz)
-    return <div className="text-white p-6">Loading quiz...</div>;
+    return <div className="p-10 text-center">Loading quiz...</div>;
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white p-6">
-      <h1 className="text-3xl font-bold mb-4">{quiz.title}</h1>
+    <div className="min-h-screen bg-gradient-to-br from-green-100 via-slate-100 to-emerald-100 py-10">
 
-      {/* ---------------- TIMER ---------------- */}
-      {!result && (
-        <p className="mb-4 text-red-400">
-          Time Left: {Math.floor(timeLeft / 60)}:
-          {String(timeLeft % 60).padStart(2, "0")}
-        </p>
-      )}
+      <div className="max-w-5xl mx-auto px-6">
 
-      {/* ---------------- PROGRESS BAR ---------------- */}
-      {!result && (
-        <div className="mb-6">
-          <p className="text-sm text-gray-400 mb-2">
-            Progress: {Object.keys(answers).length} /{" "}
-            {quiz.questions.length} answered
-          </p>
+        <h1 className="text-3xl font-bold mb-6 text-gray-800 tracking-tight select-none">
+          {quiz.title}
+        </h1>
 
-          <div className="w-full bg-slate-700 h-3 rounded-full">
-            <div
-              className="bg-blue-500 h-3 rounded-full transition-all duration-300"
-              style={{
-                width: `${(Object.keys(answers).length /
-                    quiz.questions.length) *
-                  100
-                  }%`,
-              }}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* ---------------- RESULT SECTION ---------------- */}
-      {result && (
-        <div className="mb-6 bg-green-700 p-4 rounded-xl transition-all duration-500">
-          <h2 className="text-xl font-bold mb-2">
-            Your Score: {result.score}/{result.totalQuestions}
-          </h2>
-
-          <p>Attempt Count: {result.attemptCount}</p>
-          <p className="mb-4">
-            Best Score:{" "}
-            <span className="font-bold">{result.bestScore}</span>
-          </p>
-
-          <div className="bg-slate-800 p-4 rounded-xl mt-4">
-            <h3 className="font-semibold mb-2">
-              Attempt History
-            </h3>
-
-            {result.attempts.map((attempt, index) => (
-              <div
-                key={index}
-                className={`mb-1 p-2 rounded ${attempt.score === result.bestScore
-                    ? "bg-yellow-600"
-                    : "bg-slate-700"
-                  }`}
-              >
-                Attempt {index + 1} → {attempt.score}/
-                {result.totalQuestions}
-                {attempt.score === result.bestScore && " ⭐"}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* ---------------- QUESTIONS ---------------- */}
-      {quiz.questions.map((q, index) => (
-        <div
-          key={q._id}
-          className="mb-6 bg-slate-800 p-6 rounded-2xl border border-slate-700 shadow hover:border-blue-500 transition"
-        >
-          <h2 className="font-semibold mb-4 text-lg whitespace-pre-line font-mono">
-            {index + 1}. {q.question}
-          </h2>
-
-          {q.options.map((option, i) => (
-            <label
-              key={i}
-              className={`block mb-2 cursor-pointer p-3 rounded-lg border transition ${result
-                  ? i === result.correctAnswers.find(
-                    (c) => c.questionId === q._id
-                  )?.correctAnswer
-                    ? "bg-green-600 border-green-400"
-                    : answers[q._id] === i
-                      ? "bg-red-600 border-red-400"
-                      : "border-slate-700"
-                  : answers[q._id] === i
-                    ? "bg-blue-600 border-blue-400"
-                    : "border-slate-700 hover:bg-slate-700"
-                }`}
-            >
-              <input
-                type="radio"
-                name={q._id}
-                className="mr-2"
-                disabled={result !== null}
-                checked={answers[q._id] === i}
-                onChange={() => handleOptionChange(q._id, i)}
-              />
-              {option}
-            </label>
-          ))}
-        </div>
-      ))}
-
-      {/* ---------------- BUTTONS ---------------- */}
-      <div className="mt-4">
         {!result && (
-          <button
-            onClick={() => handleSubmit(false)}
-            disabled={loading}
-            className="bg-green-600 px-6 py-2 rounded-xl hover:bg-green-500 disabled:opacity-50"
-          >
-            {loading ? "Submitting..." : "Submit Quiz"}
-          </button>
+  <QuizTimer
+    duration={quiz.duration * 60}
+    timeLeft={timeLeft}
+  />
+)}
+
+        {/* PROGRESS */}
+        {!result && (
+          <div className="bg-white p-4 rounded-xl shadow-sm border mb-6">
+            <p className="text-sm text-gray-500 mb-2">
+              Progress: {Object.keys(answers).length} / {quiz.questions.length}
+            </p>
+
+            <div className="w-full bg-gray-200 h-3 rounded-full">
+              <div
+                className="bg-blue-500 h-3 rounded-full transition-all duration-300"
+                style={{
+                  width: `${
+                    (Object.keys(answers).length / quiz.questions.length) * 100
+                  }%`,
+                }}
+              />
+            </div>
+          </div>
         )}
 
+        {/* RESULT */}
         {result && (
-          <>
-            <button
-              onClick={handleRetake}
-              className="bg-blue-600 px-6 py-2 rounded-xl hover:bg-blue-500"
-            >
-              Retake Quiz
-            </button>
+          <div className="bg-white p-6 rounded-xl shadow border mb-6">
+
+            <h2 className="text-xl font-bold mb-2">
+              Score:
+              <span className="text-green-600 ml-2">
+                {result.score}/{result.totalQuestions}
+              </span>
+            </h2>
+
+            <p>Attempt Count: {result.attemptCount}</p>
+            <p>Best Score: {result.bestScore}</p>
 
             <button
-              onClick={() => navigate("/")}
-              className="ml-4 bg-gray-600 px-6 py-2 rounded-xl hover:bg-gray-500"
+              onClick={() => setShowHistory(!showHistory)}
+              className="mt-4 text-blue-600 font-medium"
             >
-              Back to Topics
+              Attempt History ▼
             </button>
-          </>
+
+            {showHistory && (
+              <div className="mt-3 border rounded-lg p-3 bg-gray-50">
+                {result.attempts.map((attempt, index) => (
+                  <div key={index} className="py-1">
+                    Attempt {index + 1} → {attempt.score}/{result.totalQuestions}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         )}
+
+        {/* QUESTIONS */}
+        {quiz.questions.map((q, index) => (
+          <div
+            key={q._id}
+            className="mb-6 bg-white p-6 rounded-xl border shadow-sm"
+          >
+
+            <h2 className="font-semibold mb-4 text-lg whitespace-pre-line">
+              {index + 1}. {q.question}
+            </h2>
+
+            {q.options.map((option, i) => {
+  const correct = result?.correctAnswers.find(
+    (c) => c.questionId === q._id
+  )?.correctAnswer;
+
+  const isSelected = answers[q._id] === i;
+
+  return (
+    <label
+      key={i}
+      className={`flex items-center gap-2 mb-2 p-3 rounded-lg border cursor-pointer transition
+      ${
+        !result && isSelected
+          ? "border-blue-500 bg-blue-50"
+          : "border-gray-200 hover:bg-gray-50"
+      }`}
+    >
+      <input
+        type="radio"
+        name={q._id}
+        disabled={result !== null}
+        checked={isSelected}
+        onChange={() => handleOptionChange(q._id, i)}
+        className="mr-3"
+      />
+
+      <span className="flex items-center gap-2">
+        {option}
+
+        {result && i === correct && (
+          <FaCheckCircle className="text-green-500" />
+        )}
+
+        {result && isSelected && i !== correct && (
+          <FaTimesCircle className="text-red-500" />
+        )}
+      </span>
+    </label>
+  );
+})}
+          </div>
+        ))}
+
+        {/* BUTTONS */}
+        <div className="mt-6">
+
+          {!result && (
+            <button
+              onClick={() => handleSubmit(false)}
+              disabled={loading}
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-500 transition"
+            >
+              {loading ? "Submitting..." : "Submit Quiz"}
+            </button>
+          )}
+
+          {result && (
+            <>
+              <button
+                onClick={handleRetake}
+                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-500"
+              >
+                Retake Quiz
+              </button>
+
+              <button
+                onClick={() => navigate("/")}
+                className="ml-4 bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-500"
+              >
+                Back to Topics
+              </button>
+            </>
+          )}
+
+        </div>
+
       </div>
     </div>
   );

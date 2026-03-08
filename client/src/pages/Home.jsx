@@ -2,16 +2,19 @@ import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
+import { FaClock, FaBookOpen } from "react-icons/fa";
+import { FiTrash2 } from "react-icons/fi";
 
 function Home() {
   const [quizzes, setQuizzes] = useState([]);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
 
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const isAdmin = storedUser?.user?.role === "admin";
 
-  // ---------------- FETCH QUIZZES ----------------
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
@@ -21,33 +24,36 @@ function Home() {
         setError(
           err.response?.data?.message || "Failed to fetch quizzes"
         );
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchQuizzes();
   }, []);
-  
+
   const handleStartQuiz = (quiz) => {
-  const confirmStart = window.confirm(
-    `Start "${quiz.title}" quiz?\n\nDuration: ${quiz.duration} minutes.\nThe timer will begin immediately.`
-  );
+    const confirmStart = window.confirm(
+      `Start "${quiz.title}" quiz?\n\nDuration: ${quiz.duration} minutes.`
+    );
 
-  if (!confirmStart) return;
+    if (!confirmStart) return;
 
-  navigate(`/quiz/${quiz.topic}`);
-};
+    navigate(`/quiz/${quiz.topic}`);
+  };
 
-  // ---------------- DELETE QUIZ (ADMIN) ----------------
   const handleDelete = async (quizId, e) => {
-    e.stopPropagation(); // prevent card click
+    e.stopPropagation();
 
     const confirmDelete = window.confirm(
       "Are you sure you want to delete this quiz?"
     );
+
     if (!confirmDelete) return;
 
     try {
       await api.delete(`/quizzes/${quizId}`);
+
       setQuizzes((prev) =>
         prev.filter((quiz) => quiz._id !== quizId)
       );
@@ -56,21 +62,30 @@ function Home() {
     }
   };
 
+  const handleCardClick = (quiz) => {
+    if (isAdmin) {
+      navigate(`/admin/update/${quiz._id}`);
+    } else {
+      handleStartQuiz(quiz);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
+    <div className="min-h-screen bg-gradient-to-br from-green-100 via-slate-100 to-emerald-100 page-transition">
       <Navbar />
 
-      <div className="max-w-6xl mx-auto p-8">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold">
-            Available Topics 📚
+      <div className="max-w-7xl mx-auto px-6 py-12">
+
+        {/* Header */}
+        <div className="flex items-center justify-between mb-10">
+          <h2 className="text-3xl font-bold text-gray-800">
+            Available Topics
           </h2>
 
-          {/* Admin Add Quiz Button */}
           {isAdmin && (
             <button
               onClick={() => navigate("/admin/add")}
-              className="bg-green-600 px-6 py-3 rounded-xl hover:bg-green-500"
+              className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-500 transition"
             >
               + Add Quiz
             </button>
@@ -78,63 +93,85 @@ function Home() {
         </div>
 
         {error && (
-          <p className="text-red-500 mb-4">{error}</p>
+          <p className="text-red-500 mb-6">{error}</p>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {quizzes.map((quiz) => (
-            <div
-              key={quiz._id}
-              onClick={() => handleStartQuiz(quiz)}
-              className="cursor-pointer bg-slate-800 p-6 rounded-2xl shadow-lg border border-slate-700 
-  hover:shadow-2xl hover:scale-[1.03] hover:border-blue-500 
-  transition-all duration-300 flex flex-col justify-between"
-            >
-              <div>
-                <h3 className="text-xl font-semibold mb-2 flex items-center gap-2">
-                  📘 {quiz.title}
-                </h3>
+        {/* Quiz Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-8">
 
-                <p className="text-gray-400 mb-4">
-                  {quiz.description}
-                </p>
+          {loading ? (
 
-                <p className="text-sm text-gray-500 flex items-center gap-2">
-                  ⏱ Duration: {quiz.duration} mins
-                </p>
-              </div>
-
-              {/* User Button */}
-              <button
-                className="mt-4 bg-blue-600 hover:bg-blue-500 px-4 py-2 rounded-lg transition"
+            [...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="animate-pulse bg-white p-6 rounded-xl shadow border border-gray-200"
               >
-                Start Quiz
-              </button>
+                <div className="h-4 bg-gray-300 rounded w-3/4 mb-4"></div>
+                <div className="h-3 bg-gray-200 rounded w-full mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded w-2/3 mb-4"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/3"></div>
+              </div>
+            ))
 
-              {/* Admin Controls */}
-              {isAdmin && (
-                <div
-                  className="mt-4 flex gap-2"
-                  onClick={(e) => e.stopPropagation()}
-                >
+          ) : (
+
+            quizzes.map((quiz) => (
+              <div
+                key={quiz._id}
+                onClick={() => handleCardClick(quiz)}
+                className="group cursor-pointer bg-white p-6 rounded-xl shadow-md border border-gray-200
+                hover:shadow-[0_10px_30px_rgba(0,0,0,0.12)] hover:-translate-y-3 hover:border-blue-300
+                transition-all duration-300 relative flex flex-col justify-between"
+              >
+
+                {/* Delete icon for admin */}
+                {isAdmin && (
                   <button
                     onClick={(e) => handleDelete(quiz._id, e)}
-                    className="bg-red-600 px-4 py-2 rounded-lg hover:bg-red-500"
+                    className="absolute top-4 right-4 text-gray-400 hover:text-red-500 transition"
                   >
-                    Delete
+                    <FiTrash2 size={20} />
                   </button>
+                )}
 
-                  <button
-                    onClick={() => navigate(`/admin/update/${quiz._id}`)}
-                    className="bg-yellow-600 px-4 py-2 rounded-lg hover:bg-yellow-500"
-                  >
-                    Update
-                  </button>
+                <div>
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2 text-gray-800">
+                    <FaBookOpen className="text-blue-600" />
+                    {quiz.title}
+                  </h3>
+
+                  <p className="text-gray-600 mb-5 text-sm">
+                    {quiz.description}
+                  </p>
+
+                  <p className="text-sm text-gray-500 flex items-center gap-2">
+                    <FaClock />
+                    {quiz.duration} minutes
+                  </p>
                 </div>
-              )}
-            </div>
-          ))}
+
+                {/* Start button for users */}
+                {!isAdmin && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleStartQuiz(quiz);
+                    }}
+                    className="mt-6 w-full text-center opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0
+                    bg-blue-100 hover:bg-blue-200 text-blue-700
+                    py-2 rounded-lg transition-all duration-300 font-medium"
+                  >
+                    Start Quiz
+                  </button>
+                )}
+
+              </div>
+            ))
+
+          )}
+
         </div>
+
       </div>
     </div>
   );
