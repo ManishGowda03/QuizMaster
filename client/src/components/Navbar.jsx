@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { FaBrain } from "react-icons/fa";
+import { GiBrain } from "react-icons/gi";
 
 function Navbar() {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ function Navbar() {
         onClick={() => navigate("/")}
         className="flex items-center gap-2 cursor-pointer"
       >
-        <FaBrain className="text-emerald-300 text-2xl" />
+        <GiBrain className="text-grey-100 text-2xl" />
         <h1 className="text-xl font-bold text-gray-900">
           QuizMaster
         </h1>

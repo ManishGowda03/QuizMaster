@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../utils/api";
-import { FaCheckCircle, FaTimesCircle, FaClock } from "react-icons/fa";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import QuizTimer from "../components/QuizTimer";
+import Confetti from "react-confetti";
 
 const QuizPage = () => {
   const { topic } = useParams();
@@ -14,8 +15,27 @@ const QuizPage = () => {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const answeredCount = Object.keys(answers).length;
+  const [windowSize, setWindowSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
 
-  // Fetch quiz
+  /* Window resize for confetti */
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  /* Fetch Quiz */
   useEffect(() => {
     const fetchQuiz = async () => {
       const res = await api.get(`/quizzes/${topic}`);
@@ -26,7 +46,7 @@ const QuizPage = () => {
     fetchQuiz();
   }, [topic]);
 
-  // Timer
+  /* Timer */
   useEffect(() => {
     if (!quiz) return;
 
@@ -52,30 +72,36 @@ const QuizPage = () => {
   };
 
   const handleSubmit = async (auto = false) => {
-    if (result || loading) return;
+  if (result || loading) return;
 
-    if (!auto) {
-      const confirmSubmit = window.confirm(
-        "Are you sure you want to submit the quiz?"
-      );
-      if (!confirmSubmit) return;
-    }
+  // Prevent manual submit if not all questions answered
+  if (!auto && answeredCount !== quiz.questions.length) {
+    alert("Please answer all questions before submitting the quiz.");
+    return;
+  }
 
-    setLoading(true);
+  if (!auto) {
+    const confirmSubmit = window.confirm(
+      "Are you sure you want to submit the quiz?"
+    );
+    if (!confirmSubmit) return;
+  }
 
-    const formattedAnswers = Object.keys(answers).map((id) => ({
-      questionId: id,
-      selectedOption: answers[id],
-    }));
+  setLoading(true);
 
-    const res = await api.post("/attempts", {
-      quizId: quiz._id,
-      answers: formattedAnswers,
-    });
+  const formattedAnswers = Object.keys(answers).map((id) => ({
+    questionId: id,
+    selectedOption: answers[id],
+  }));
 
-    setResult(res.data);
-    setLoading(false);
-  };
+  const res = await api.post("/attempts", {
+    quizId: quiz._id,
+    answers: formattedAnswers,
+  });
+
+  setResult(res.data);
+  setLoading(false);
+};
 
   const handleRetake = () => {
     setAnswers({});
@@ -83,11 +109,26 @@ const QuizPage = () => {
     setTimeLeft(quiz.duration * 60);
   };
 
-  if (!quiz)
-    return <div className="p-10 text-center">Loading quiz...</div>;
+  if (!quiz) {
+    return (
+      <div className="p-10 text-center text-gray-700">
+        Loading quiz...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-100 via-slate-100 to-emerald-100 py-10">
+
+      {/* Confetti for Perfect Score */}
+      {result && result.score === result.totalQuestions && (
+        <Confetti
+          width={windowSize.width}
+          height={windowSize.height}
+          numberOfPieces={300}
+          recycle={false}
+        />
+      )}
 
       <div className="max-w-5xl mx-auto px-6">
 
@@ -95,12 +136,13 @@ const QuizPage = () => {
           {quiz.title}
         </h1>
 
+        {/* TIMER */}
         {!result && (
-  <QuizTimer
-    duration={quiz.duration * 60}
-    timeLeft={timeLeft}
-  />
-)}
+          <QuizTimer
+            duration={quiz.duration * 60}
+            timeLeft={timeLeft}
+          />
+        )}
 
         {/* PROGRESS */}
         {!result && (
@@ -114,7 +156,9 @@ const QuizPage = () => {
                 className="bg-blue-500 h-3 rounded-full transition-all duration-300"
                 style={{
                   width: `${
-                    (Object.keys(answers).length / quiz.questions.length) * 100
+                    (Object.keys(answers).length /
+                      quiz.questions.length) *
+                    100
                   }%`,
                 }}
               />
@@ -152,6 +196,7 @@ const QuizPage = () => {
                 ))}
               </div>
             )}
+
           </div>
         )}
 
@@ -167,80 +212,93 @@ const QuizPage = () => {
             </h2>
 
             {q.options.map((option, i) => {
-  const correct = result?.correctAnswers.find(
-    (c) => c.questionId === q._id
-  )?.correctAnswer;
+              const correct = result?.correctAnswers.find(
+                (c) => c.questionId === q._id
+              )?.correctAnswer;
 
-  const isSelected = answers[q._id] === i;
+              const isSelected = answers[q._id] === i;
 
-  return (
-    <label
-      key={i}
-      className={`flex items-center gap-2 mb-2 p-3 rounded-lg border cursor-pointer transition
-      ${
-        !result && isSelected
-          ? "border-blue-500 bg-blue-50"
-          : "border-gray-200 hover:bg-gray-50"
-      }`}
-    >
-      <input
-        type="radio"
-        name={q._id}
-        disabled={result !== null}
-        checked={isSelected}
-        onChange={() => handleOptionChange(q._id, i)}
-        className="mr-3"
-      />
+              return (
+                <label
+                  key={i}
+                  className={`flex items-center gap-2 mb-2 p-3 rounded-lg border cursor-pointer transition
+                  ${
+                    !result && isSelected
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-gray-200 hover:bg-gray-50"
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name={q._id}
+                    disabled={result !== null}
+                    checked={isSelected}
+                    onChange={() => handleOptionChange(q._id, i)}
+                    className="mr-3"
+                  />
 
-      <span className="flex items-center gap-2">
-        {option}
+                  <span className="flex items-center gap-2">
+                    {option}
 
-        {result && i === correct && (
-          <FaCheckCircle className="text-green-500" />
-        )}
+                    {result && i === correct && (
+                      <FaCheckCircle className="text-green-500" />
+                    )}
 
-        {result && isSelected && i !== correct && (
-          <FaTimesCircle className="text-red-500" />
-        )}
-      </span>
-    </label>
-  );
-})}
+                    {result && isSelected && i !== correct && (
+                      <FaTimesCircle className="text-red-500" />
+                    )}
+                  </span>
+                </label>
+              );
+            })}
           </div>
         ))}
 
         {/* BUTTONS */}
-        <div className="mt-6">
+<div className="mt-6">
 
-          {!result && (
-            <button
-              onClick={() => handleSubmit(false)}
-              disabled={loading}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-500 transition"
-            >
-              {loading ? "Submitting..." : "Submit Quiz"}
-            </button>
-          )}
+  {!result && (
+    <>
+      <button
+        onClick={() => handleSubmit(false)}
+        disabled={loading || answeredCount !== quiz.questions.length}
+        className={`px-6 py-3 rounded-lg text-white transition
+        ${
+          answeredCount !== quiz.questions.length
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-500"
+        }`}
+      >
+        {loading ? "Submitting..." : "Submit Quiz"}
+      </button>
 
-          {result && (
-            <>
-              <button
-                onClick={handleRetake}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-500"
-              >
-                Retake Quiz
-              </button>
+      {answeredCount !== quiz.questions.length && (
+        <p className="text-sm text-gray-500 mt-2">
+          Please answer all questions before submitting.
+        </p>
+      )}
+    </>
+  )}
 
-              <button
-                onClick={() => navigate("/")}
-                className="ml-4 bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-500"
-              >
-                Back to Topics
-              </button>
-            </>
-          )}
+  {result && (
+    <>
+      <button
+        onClick={handleRetake}
+        className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-500"
+      >
+        Retake Quiz
+      </button>
 
-        </div>
+      <button
+        onClick={() => navigate("/")}
+        className="ml-4 bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-500"
+      >
+        Back to Topics
+      </button>
+    </>
+  )}
+
+</div>
 
       </div>
     </div>

@@ -76,6 +76,34 @@ function Home() {
 
       <div className="max-w-7xl mx-auto px-6 py-12">
 
+  {/* HERO SECTION */}
+  <div className="text-center mb-16">
+
+    <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+      Master Your Knowledge with QuizMaster
+    </h1>
+
+    <p className="text-gray-600 text-lg max-w-2xl mx-auto mb-8">
+      Challenge yourself with quizzes across multiple topics,
+      track your attempts, and improve your skills.
+    </p>
+
+    {!isAdmin && (
+      <button
+  onClick={() => {
+    const firstQuiz = quizzes[0];
+    if (firstQuiz) handleStartQuiz(firstQuiz);
+  }}
+  className="bg-blue-600 text-white px-8 py-3 rounded-lg shadow hover:bg-blue-500 transition text-lg"
+>
+  Start Learning
+</button>
+    )}
+
+  </div>
+
+  <hr className="border-gray-300 mb-10"/>
+
         {/* Header */}
         <div className="flex items-center justify-between mb-10">
           <h2 className="text-3xl font-bold text-gray-800">
