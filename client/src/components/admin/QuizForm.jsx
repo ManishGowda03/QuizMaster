@@ -67,49 +67,59 @@ function QuizForm({ initialData, onSubmit, buttonText }) {
   return (
     <form onSubmit={submitForm} className="space-y-6">
 
+      {/* TITLE */}
       <input
         type="text"
-        placeholder="Title"
-        className="w-full p-3 bg-gray-800 rounded"
+        placeholder="Quiz Title"
+        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         required
       />
 
+      {/* TOPIC */}
       <input
         type="text"
-        placeholder="Topic"
-        className="w-full p-3 bg-gray-800 rounded"
+        placeholder="Topic (URL friendly)"
+        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
         value={topic}
         onChange={(e) => setTopic(e.target.value)}
         required
       />
 
+      {/* DURATION */}
       <input
         type="number"
         placeholder="Duration (minutes)"
-        className="w-full p-3 bg-gray-800 rounded"
+        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
         value={duration}
         onChange={(e) => setDuration(e.target.value)}
         required
       />
 
+      {/* DESCRIPTION */}
       <textarea
-        placeholder="Description"
-        className="w-full p-3 bg-gray-800 rounded"
+        placeholder="Quiz Description"
+        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-400"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         required
       />
 
+      {/* QUESTIONS */}
       {questions.map((q, qIndex) => (
-        <div key={qIndex} className="bg-gray-800 p-6 rounded-xl space-y-4">
+        <div
+          key={qIndex}
+          className="bg-gray-50 border border-gray-200 p-6 rounded-xl space-y-4"
+        >
 
-          <h3 className="font-semibold">Question {qIndex + 1}</h3>
+          <h3 className="font-semibold text-gray-700">
+            Question {qIndex + 1}
+          </h3>
 
           <textarea
             rows="3"
-            className="w-full p-3 bg-gray-700 rounded whitespace-pre-line"
+            className="w-full p-3 border border-gray-300 rounded-lg"
             value={q.question}
             onChange={(e) =>
               handleQuestionChange(qIndex, e.target.value)
@@ -122,7 +132,7 @@ function QuizForm({ initialData, onSubmit, buttonText }) {
               key={oIndex}
               type="text"
               placeholder={`Option ${oIndex + 1}`}
-              className="w-full p-2 bg-gray-700 rounded"
+              className="w-full p-3 border border-gray-300 rounded-lg"
               value={option}
               onChange={(e) =>
                 handleOptionChange(qIndex, oIndex, e.target.value)
@@ -132,7 +142,7 @@ function QuizForm({ initialData, onSubmit, buttonText }) {
           ))}
 
           <select
-            className="w-full p-2 bg-gray-700 rounded"
+            className="w-full p-3 border border-gray-300 rounded-lg"
             value={q.correctAnswer}
             onChange={(e) =>
               handleCorrectAnswerChange(qIndex, e.target.value)
@@ -148,28 +158,33 @@ function QuizForm({ initialData, onSubmit, buttonText }) {
             <button
               type="button"
               onClick={() => removeQuestion(qIndex)}
-              className="bg-red-600 px-4 py-2 rounded"
+              className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
             >
               Delete Question
             </button>
           )}
+
         </div>
       ))}
 
-      <button
-        type="button"
-        onClick={addQuestion}
-        className="bg-blue-600 px-6 py-2 rounded"
-      >
-        + Add Question
-      </button>
+      <div className="flex gap-6 mt-6">
 
-      <button
-        type="submit"
-        className="bg-green-600 px-6 py-3 rounded"
-      >
-        {buttonText}
-      </button>
+        <button
+          type="button"
+          onClick={addQuestion}
+          className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-500 transition shadow"
+        >
+          + Add Question
+        </button>
+
+        <button
+          type="submit"
+          className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-500 w-fit"
+        >
+          {buttonText}
+        </button>
+
+      </div>
 
     </form>
   );
