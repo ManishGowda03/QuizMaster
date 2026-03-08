@@ -1,6 +1,5 @@
 # QuizMaster 🧠
 
-A Full Stack MERN Quiz Platform
 
 QuizMaster is a full-stack quiz platform where users can test their knowledge across multiple topics while administrators can manage quizzes.
 The platform supports timed quizzes, attempt tracking, and a clean responsive UI.
