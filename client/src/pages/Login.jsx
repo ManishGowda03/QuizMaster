@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
-import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { GiBrain } from "react-icons/gi";
 import { toast } from "react-toastify";
 
@@ -9,7 +9,6 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
@@ -26,7 +25,9 @@ function Login() {
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data));
+
       toast.success("Login successful 🎉");
+
       navigate("/");
     } catch (err) {
       toast.error(err.response?.data?.message || "Login failed");
@@ -41,7 +42,7 @@ function Login() {
         className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-200"
       >
 
-        {/* QuizMaster Icon */}
+        {/* Logo */}
         <div className="flex justify-center mb-6">
           <div className="bg-gradient-to-br from-green-500 to-emerald-600 text-white p-4 rounded-xl shadow-md">
             <GiBrain size={28} />
@@ -52,51 +53,63 @@ function Login() {
           Login to QuizMaster
         </h2>
 
-        {error && (
-          <p className="text-red-500 text-sm mb-4 text-center">
-            {error}
-          </p>
-        )}
-
         {/* Email */}
-        <div className="flex items-center border border-gray-300 rounded-lg px-3 mb-4 bg-gray-50">
-          <FaEnvelope className="text-gray-400 mr-2" />
+        <div className="relative mb-5">
+
           <input
             type="email"
-            placeholder="name@gmail.com"
-            className="w-full p-3 bg-transparent outline-none"
+            placeholder=" "
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            className="peer w-full border border-gray-300 rounded-lg p-3 pt-5 outline-none focus:border-blue-500"
           />
+
+          <label className="absolute left-3 top-2 text-gray-500 text-sm transition-all
+          peer-placeholder-shown:top-3
+          peer-placeholder-shown:text-base
+          peer-placeholder-shown:text-gray-400
+          peer-focus:top-2
+          peer-focus:text-sm
+          peer-focus:text-blue-600">
+            Email Address
+          </label>
+
         </div>
 
         {/* Password */}
-        <div className="flex items-center border border-gray-300 rounded-lg px-3 mb-6 bg-gray-50">
-
-          <FaLock className="text-gray-400 mr-2" />
+        <div className="relative mb-6">
 
           <input
             type={showPassword ? "text" : "password"}
-            placeholder="Enter your password"
-            className="w-full p-3 bg-transparent outline-none"
+            placeholder=" "
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            className="peer w-full border border-gray-300 rounded-lg p-3 pt-5 outline-none focus:border-blue-500"
           />
 
-          {/* Eye Toggle */}
+          <label className="absolute left-3 top-2 text-gray-500 text-sm transition-all
+          peer-placeholder-shown:top-3
+          peer-placeholder-shown:text-base
+          peer-placeholder-shown:text-gray-400
+          peer-focus:top-2
+          peer-focus:text-sm
+          peer-focus:text-blue-600">
+            Password
+          </label>
+
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="text-gray-400 hover:text-gray-600"
+            className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
           >
             {showPassword ? <FaEyeSlash /> : <FaEye />}
           </button>
 
         </div>
 
-        {/* Sign In Button */}
+        {/* Login Button */}
         <button
           type="submit"
           className="w-full bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-lg font-semibold shadow transition"
