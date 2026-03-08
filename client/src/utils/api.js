@@ -2,7 +2,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api",
+  baseURL: "https://quizmaster-s2c3.onrender.com/api",
 });
 
 /* Attach token automatically */
