@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 @keyframes pageFade {
   from {
     opacity: 0;
@@ -14,4 +15,13 @@
 
 .page-transition {
   animation: pageFade 0.4s ease;
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.2s ease-out;
 }

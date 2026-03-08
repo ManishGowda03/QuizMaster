@@ -4,6 +4,7 @@ import api from "../utils/api";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
 import QuizTimer from "../components/QuizTimer";
 import Confetti from "react-confetti";
+import { toast } from "react-toastify";
 
 const QuizPage = () => {
   const { topic } = useParams();
@@ -100,6 +101,7 @@ const QuizPage = () => {
   });
 
   setResult(res.data);
+  toast.success("Quiz submitted!");
   setLoading(false);
 };
 

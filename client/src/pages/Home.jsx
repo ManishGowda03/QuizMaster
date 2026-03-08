@@ -4,6 +4,7 @@ import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import { FaClock, FaBookOpen } from "react-icons/fa";
 import { FiTrash2 } from "react-icons/fi";
+import { toast } from "react-toastify";
 
 function Home() {
   const [quizzes, setQuizzes] = useState([]);
@@ -57,6 +58,7 @@ function Home() {
       setQuizzes((prev) =>
         prev.filter((quiz) => quiz._id !== quizId)
       );
+      toast.success("Quiz deleted successfully");
     } catch (error) {
       console.error("Delete failed:", error);
     }

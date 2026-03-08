@@ -3,6 +3,7 @@ import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { GiBrain } from "react-icons/gi";
+import { toast } from "react-toastify";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -25,10 +26,10 @@ function Login() {
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data));
-
+      toast.success("Login successful 🎉");
       navigate("/");
     } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
+      toast.error(err.response?.data?.message || "Login failed");
     }
   };
 
@@ -62,7 +63,7 @@ function Login() {
           <FaEnvelope className="text-gray-400 mr-2" />
           <input
             type="email"
-            placeholder="name@example.com"
+            placeholder="name@gmail.com"
             className="w-full p-3 bg-transparent outline-none"
             value={email}
             onChange={(e) => setEmail(e.target.value)}

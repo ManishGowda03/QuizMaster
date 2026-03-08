@@ -1,11 +1,14 @@
 import { useState } from "react";
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
+import { FaEnvelope, FaLock, FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
+import { GiBrain } from "react-icons/gi";
 
 function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
@@ -39,52 +42,101 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-100 via-slate-100 to-emerald-100 px-4">
+
       <form
         onSubmit={handleSubmit}
-        className="bg-gray-800 p-8 rounded-xl shadow-lg w-96"
+        className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-md border border-gray-200"
       >
-        <h2 className="text-2xl font-bold text-white mb-6 text-center">
-          Register
+
+        {/* QuizMaster Icon */}
+        <div className="flex justify-center mb-6">
+          <div className="bg-gradient-to-br from-green-500 to-emerald-600 text-white p-4 rounded-xl shadow-md">
+            <GiBrain size={28} />
+          </div>
+        </div>
+
+        <h2 className="text-2xl font-bold text-gray-800 text-center mb-6">
+          Create your account
         </h2>
 
         {error && (
-          <p className="text-red-500 text-sm mb-4 text-center">{error}</p>
+          <p className="text-red-500 text-sm mb-4 text-center">
+            {error}
+          </p>
         )}
 
-        <input
-          type="text"
-          placeholder="Name"
-          className="w-full p-3 mb-4 rounded-lg bg-gray-700 text-white"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
+        {/* Name */}
+        <div className="flex items-center border border-gray-300 rounded-lg px-3 mb-4 bg-gray-50">
+          <FaUser className="text-gray-400 mr-2" />
+          <input
+            type="text"
+            placeholder="Full name"
+            className="w-full p-3 bg-transparent outline-none"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
 
-        <input
-          type="email"
-          placeholder="Email"
-          className="w-full p-3 mb-4 rounded-lg bg-gray-700 text-white"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
+        {/* Email */}
+        <div className="flex items-center border border-gray-300 rounded-lg px-3 mb-4 bg-gray-50">
+          <FaEnvelope className="text-gray-400 mr-2" />
+          <input
+            type="email"
+            placeholder="name@gmail.com"
+            className="w-full p-3 bg-transparent outline-none"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+        </div>
 
-        <input
-          type="password"
-          placeholder="Password"
-          className="w-full p-3 mb-6 rounded-lg bg-gray-700 text-white"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
+        {/* Password */}
+        <div className="flex items-center border border-gray-300 rounded-lg px-3 mb-6 bg-gray-50">
 
+          <FaLock className="text-gray-400 mr-2" />
+
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="Create a strong password"
+            className="w-full p-3 bg-transparent outline-none"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="text-gray-400 hover:text-gray-600"
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
+
+        </div>
+
+        {/* Register Button */}
         <button
           type="submit"
-          className="w-full bg-green-600 hover:bg-green-700 text-white p-3 rounded-lg font-semibold"
+          className="w-full bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-lg font-semibold shadow transition"
         >
           Register
         </button>
+
+        <div className="my-6 border-t"></div>
+
+        {/* Login Link */}
+        <p className="text-center text-gray-500 text-sm">
+          Already have an account?{" "}
+          <span
+            onClick={() => navigate("/login")}
+            className="text-blue-600 font-semibold cursor-pointer hover:underline"
+          >
+            Login
+          </span>
+        </p>
+
       </form>
     </div>
   );
