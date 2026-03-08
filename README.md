@@ -1,11 +1,13 @@
-QuizMaster 
-<br>
+# QuizMaster 🧠
+
 QuizMaster is a full-stack quiz platform where users can test their knowledge across multiple topics while administrators can manage quizzes.
 The platform supports timed quizzes, attempt tracking, and a clean responsive UI.
-<br>
-Features
 
-User Features
+---
+
+## 🚀 Features
+
+### User Features
 - User Registration & Login
 - Take quizzes across multiple topics
 - Timer based quiz system
@@ -13,13 +15,17 @@ User Features
 - Attempt history tracking
 - Best score tracking
 - Confetti animation for perfect score
+- Responsive UI (mobile & desktop)
 
- Admin Features
+### Admin Features
 - Create quizzes
 - Update quizzes
 - Delete quizzes
 - Add multiple questions with options
 - Set correct answers
+- Set quiz difficulty (Easy / Medium / Hard)
+
+---
 
 ## 🛠 Tech Stack
 
