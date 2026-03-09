@@ -43,5 +43,5 @@ The platform supports timed quizzes, attempt tracking, and a clean responsive UI
 
 ## Live Demo
 
-Frontend: https://quiz-master-af2grp443-manishgowda03s-projects.vercel.app  
+Frontend: https://quiz-master-murex-five.vercel.app/login
 Backend API: https://quizmaster-s2c3.onrender.com
