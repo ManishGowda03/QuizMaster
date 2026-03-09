@@ -17,6 +17,19 @@ function Home() {
   const isAdmin = storedUser?.user?.role === "admin";
 
   useEffect(() => {
+  const wakeServer = async () => {
+    try {
+      await fetch("https://quizmaster-s2c3.onrender.com/api/health");
+      console.log("Backend awakened");
+    } catch (error) {
+      console.log("Backend wake attempt failed");
+    }
+  };
+
+  wakeServer();
+}, []);
+
+  useEffect(() => {
     const fetchQuizzes = async () => {
       try {
         const res = await api.get("/quizzes");
