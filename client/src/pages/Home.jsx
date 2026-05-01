@@ -184,8 +184,16 @@ function Home() {
                   </h3>
 
                   <p className="text-gray-600 mb-5 text-sm">
-                    {quiz.description}
-                  </p>
+  {/* Mobile view */}
+  <span className="block md:hidden">
+    {quiz.description.split(" ").slice(0, 8).join(" ")}...
+  </span>
+
+  {/* Desktop view */}
+  <span className="hidden md:block">
+    {quiz.description}
+  </span>
+</p>
 
                   <p className="text-sm text-gray-500 flex items-center gap-2">
                     <FaClock />

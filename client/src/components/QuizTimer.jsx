@@ -1,64 +1,27 @@
 import React from "react";
 
-const QuizTimer = ({ duration, timeLeft }) => {
-  const radius = 45;
-  const circumference = 2 * Math.PI * radius;
+const QuizTimer = ({ timeLeft }) => {
+  const minutes = Math.floor(timeLeft / 60);
+  const seconds = timeLeft % 60;
 
-  const progress = timeLeft / duration;
-  const strokeDashoffset = circumference - progress * circumference;
+  const formattedTime = `${minutes}:${seconds
+    .toString()
+    .padStart(2, "0")}`;
 
-  // Change color based on time left
-  let color = "#3b82f6"; // blue
+  // 🎯 Color based on ACTUAL time
+  let colorClass = "text-green-600";
 
-  if (progress < 0.5) {
-    color = "#f59e0b"; // orange
-  }
-
-  if (progress < 0.2) {
-    color = "#ef4444"; // red
+  if (timeLeft <= 60) {
+    colorClass = "text-red-600 animate-pulse";
+  } else if (timeLeft <= 180) {
+    colorClass = "text-yellow-500"; // 🟡 < 3 min
   }
 
   return (
-    <div className="flex justify-center mb-6">
-      <div className="relative w-28 h-28">
-
-        <svg
-          className="transform -rotate-90"
-          width="110"
-          height="110"
-        >
-          {/* Background circle */}
-          <circle
-            cx="55"
-            cy="55"
-            r={radius}
-            stroke="#e5e7eb"
-            strokeWidth="8"
-            fill="none"
-          />
-
-          {/* Progress circle */}
-          <circle
-            cx="55"
-            cy="55"
-            r={radius}
-            stroke={color}
-            strokeWidth="8"
-            fill="none"
-            strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
-            strokeLinecap="round"
-            className="transition-all duration-1000"
-          />
-        </svg>
-
-        {/* Timer text */}
-        <div className="absolute inset-0 flex items-center justify-center text-lg font-semibold text-gray-700">
-          {Math.floor(timeLeft / 60)}:
-          {String(timeLeft % 60).padStart(2, "0")}
-        </div>
-
-      </div>
+    <div className="flex justify-end mb-6 pr-4">
+      <span className={`text-2xl font-bold ${colorClass}`}>
+        {formattedTime}
+      </span>
     </div>
   );
 };
